@@ -5,15 +5,12 @@ const { validateFilmData } = require('../validators/filmValidator');
 let Films = require('../top250.json');
 
 function shiftPositions(films, newPosition) {
-  // Find the maximum position
   const maxPosition = Math.max(...films.map((film) => film.position), 0);
 
-  // If newPosition is greater than the next available position, adjust it
   if (newPosition > maxPosition + 1) {
     newPosition = maxPosition + 1;
   }
 
-  // Shift positions for other films to make space
   return {
     updatedFilms: films.map((film) => {
       if (film.position >= newPosition) {
@@ -21,7 +18,7 @@ function shiftPositions(films, newPosition) {
       }
       return film;
     }),
-    adjustedPosition: newPosition, // Return adjusted position for the new film
+    adjustedPosition: newPosition,
   };
 }
 
@@ -30,7 +27,6 @@ async function updateFilm(req, res) {
     const { id, title, rating, year, budget, gross, poster, position } =
       req.body;
 
-    // Validate input
     const validationErrors = validateFilmData({
       title,
       rating,
@@ -61,15 +57,13 @@ async function updateFilm(req, res) {
         budget: budget || Films[filmIndex].budget,
         gross: gross || Films[filmIndex].gross,
         poster: poster || Films[filmIndex].poster,
-        position: adjustedPosition, // Use the adjusted position
+        position: adjustedPosition,
       };
     }
 
-    // Save changes to the file
     const filePath = path.join(__dirname, '../top250.json');
     await writeDataToFile(filePath, Films);
 
-    // Respond with the updated film
     res.status(200).json(Films[filmIndex]);
   } catch (error) {
     console.log(error);
