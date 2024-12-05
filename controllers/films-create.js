@@ -1,8 +1,10 @@
 const { v4: uuidv4 } = require('uuid');
 const { writeDataToFile } = require('../utils/fileOperations');
 const path = require('path');
+const validateFilmData = require('../validators/filmValidator');
 
 let Films = require('../top250.json');
+const { error } = require('console');
 
 function shiftPositions(films, newPosition) {
   return films.map((film) => {
@@ -17,16 +19,19 @@ async function createFilms(req, res) {
   try {
     const { title, rating, year, budget, gross, poster, position } = req.body;
 
-    if (
-      !title ||
-      !rating ||
-      !year ||
-      !budget ||
-      !gross ||
-      !poster ||
-      !position
-    ) {
-      return res.status(400).json({ message: 'All fields are required.' });
+    const validationErrors = validateFilmData({
+      title,
+      rating,
+      year,
+      budget,
+      gross,
+      poster,
+      position,
+    });
+    if (validationErrors) {
+      return res
+        .status(400)
+        .json({ message: 'Validation failed', errors: validationErrors });
     }
     Films = shiftPositions(Films, position);
     const newFilm = {

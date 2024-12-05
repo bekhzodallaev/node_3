@@ -1,5 +1,6 @@
 const { writeDataToFile } = require('../utils/fileOperations');
 const path = require('path');
+const validateFilmData = require('../validators/filmValidator');
 
 let Films = require('../top250.json');
 
@@ -17,17 +18,19 @@ async function updateFilm(req, res) {
     const { id, title, rating, year, budget, gross, poster, position } =
       req.body;
 
-    if (
-      !id ||
-      !title ||
-      !rating ||
-      !year ||
-      !budget ||
-      !gross ||
-      !poster ||
-      !position
-    ) {
-      return res.status(400).json({ message: 'All fields are required.' });
+    const validationErrors = validateFilmData({
+      title,
+      rating,
+      year,
+      budget,
+      gross,
+      poster,
+      position,
+    });
+    if (validationErrors) {
+      return res
+        .status(400)
+        .json({ message: 'Validation failed', errors: validationErrors });
     }
     Films = shiftPositions(Films, position);
 
