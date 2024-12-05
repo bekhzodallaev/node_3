@@ -1,20 +1,27 @@
 const { v4: uuidv4 } = require('uuid');
 const { writeDataToFile } = require('../utils/fileOperations');
 const path = require('path');
-const validateFilmData = require('../validators/filmValidator');
+const { validateFilmData } = require('../validators/filmValidator');
 
 let Films = require('../top250.json');
-const { error } = require('console');
 
 function shiftPositions(films, newPosition) {
-  return films.map((film) => {
-    if (film.position >= newPosition) {
-      return { ...film, position: film.position + 1 };
-    }
-    return film;
-  });
-}
+  const maxPosition = Math.max(...films.map((film) => film.position), 0);
 
+  if (newPosition > maxPosition + 1) {
+    newPosition = maxPosition + 1;
+  }
+
+  return {
+    updatedFilms: films.map((film) => {
+      if (film.position >= newPosition) {
+        return { ...film, position: film.position + 1 };
+      }
+      return film;
+    }),
+    adjustedPosition: newPosition,
+  };
+}
 async function createFilms(req, res) {
   try {
     const { title, rating, year, budget, gross, poster, position } = req.body;
@@ -33,7 +40,9 @@ async function createFilms(req, res) {
         .status(400)
         .json({ message: 'Validation failed', errors: validationErrors });
     }
-    Films = shiftPositions(Films, position);
+    const { updatedFilms, adjustedPosition } = shiftPositions(Films, position);
+    Films = updatedFilms;
+
     const newFilm = {
       id: uuidv4(),
       title: title,
@@ -42,7 +51,7 @@ async function createFilms(req, res) {
       budget: budget,
       gross: gross,
       poster: poster,
-      position,
+      position: adjustedPosition,
     };
     Films.push(newFilm);
 

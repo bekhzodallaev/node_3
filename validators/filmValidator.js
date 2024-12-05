@@ -18,20 +18,17 @@ function validateFilmData(data) {
   }
 
   if (!data.year || isNaN(Date.parse(data.year)) || data.year < 1895) {
-    errors.push('A valid year is required.');
+    errors.push('valid year is required and must be a valid year');
   }
 
-  if (
-    !data.budget ||
-    typeof data.budget !== 'number' ||
-    data.budget < 0 ||
-    data.author.trim() === ''
-  ) {
+  if (!data.budget || typeof data.budget !== 'number' || data.budget < 0) {
     errors.push('A budget is required and must be a non-negative number.');
   }
-  if (!data.gross || typeof data.budget !== 'number' || data.gross < 0) {
+
+  if (!data.gross || typeof data.gross !== 'number' || data.gross < 0) {
     errors.push('A gross is required and must be a non-negative number.');
   }
+
   if (
     !data.poster ||
     !/^https?:\/\/.*\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(data.poster)
@@ -40,6 +37,7 @@ function validateFilmData(data) {
       'A valid poster URL is required and must point to an image (e.g ., .jpg, .jpeg, .png).'
     );
   }
+
   if (
     !data.position ||
     typeof data.position !== 'number' ||
@@ -47,6 +45,7 @@ function validateFilmData(data) {
   ) {
     errors.push('A position is required and must be a non-negative number');
   }
+
   return errors.length > 0 ? errors : null;
 }
 module.exports = {
