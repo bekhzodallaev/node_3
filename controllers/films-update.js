@@ -1,26 +1,8 @@
-const { writeDataToFile } = require('../utils/fileOperations');
+const { writeDataToFile, shiftPositions } = require('../utils/utils');
 const path = require('path');
 const { validateFilmData } = require('../validators/filmValidator');
 
 let Films = require('../top250.json');
-
-function shiftPositions(films, newPosition) {
-  const maxPosition = Math.max(...films.map((film) => film.position), 0);
-
-  if (newPosition > maxPosition + 1) {
-    newPosition = maxPosition + 1;
-  }
-
-  return {
-    updatedFilms: films.map((film) => {
-      if (film.position >= newPosition) {
-        return { ...film, position: film.position + 1 };
-      }
-      return film;
-    }),
-    adjustedPosition: newPosition,
-  };
-}
 
 async function updateFilm(req, res) {
   try {

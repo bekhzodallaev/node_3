@@ -1,4 +1,4 @@
-const { writeDataToFile } = require('../utils/fileOperations');
+const { writeDataToFile } = require('../utils/utils');
 const path = require('path');
 
 let Films = require('../top250.json');

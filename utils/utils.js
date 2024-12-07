@@ -12,6 +12,26 @@ function writeDataToFile(filename, content) {
     throw new Error('Failed to write data to file');
   }
 }
+
+function shiftPositions(films, newPosition) {
+  const maxPosition = Math.max(...films.map((film) => film.position), 0);
+
+  if (newPosition > maxPosition + 1) {
+    newPosition = maxPosition + 1;
+  }
+
+  return {
+    updatedFilms: films.map((film) => {
+      if (film.position >= newPosition) {
+        return { ...film, position: film.position + 1 };
+      }
+      return film;
+    }),
+    adjustedPosition: newPosition,
+  };
+}
+
 module.exports = {
   writeDataToFile,
+  shiftPositions,
 };
